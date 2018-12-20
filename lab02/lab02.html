@@ -1,0 +1,60 @@
+<HTML>
+	<BODY>
+		<canvas id='lab02' height="1000" width="1500" style="border-width: 3px" />
+		<canvas id='lab02Understudy' height="1000" width="1500" style="border-width: 3px" />
+
+		<script>
+			var buffer = [];
+			var img = new Image();
+			img.src = 'img.jpg';
+			img.onload = function(){
+				understudy(this);
+			}
+			function understudy(img){
+				var canvas = document.getElementById('lab02');
+				var ctx = canvas.getContext('2d');
+				ctx.drawImage(img,0,0);
+				var imageData, imageDataUnderstudy;
+				var data, dataUnderstudy;
+				var tmpRed, tmpGreen, tmpBlue;
+				var alghoritm = function(){
+					for(var j = 0; j < img.height; j++){
+						for(var i = 0; i < img.width; i++){
+							if((j == 0) || (j == img.height) || (i == 0) || (i == img.width)){
+								imageData = ctx.getImageData(i, j, 3, 3);
+								data = imageData.data;
+								tmpRed = data[0];
+								tmpGreen = data[1];
+								tmpBlue = data[2];
+								buffer.push(tmpRed);
+								buffer.push(tmpGreen);
+								buffer.push(tmpBlue);
+								buffer.push(255);
+							}
+							else{
+								imageData = ctx.getImageData(i, j, 3, 3);
+								data = imageData.data;
+								tmpRed = Math.floor(data[0], data[4], data[8], data[12], data[16], data[20], data[24], data[28], data[32] / 9);
+								tmpGreen = Math.floor(data[1], data[5], data[9], data[13], data[17], data[21], data[25], data[29], data[33] / 9);
+								tmpBlue = Math.floor(data[2], data[6], data[10], data[14], data[18], data[22], data[26], data[30], data[34] / 9);
+								buffer.push(tmpRed);
+								buffer.push(tmpGreen);
+								buffer.push(tmpBlue);
+								buffer.push(255);
+							}
+						}
+					}
+				}
+				alghoritm();
+				var canvasUnderstudy = document.getElementById('lab02Understudy');
+				var ctxx = canvasUnderstudy.getContext('2d');
+				imageDataUnderstudy = ctxx.getImageData(500, 0, img.width, img.height);
+				dataUnderstudy = imageDataUnderstudy.data;
+				for(q = 0; q < dataUnderstudy.length; q++){
+					dataUnderstudy[q] = buffer[q];
+				}
+				ctx.putImageData(imageDataUnderstudy, 600, 0);
+			}
+		</script>
+	</BODY>	
+</HTML>

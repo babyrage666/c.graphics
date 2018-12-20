@@ -1,0 +1,68 @@
+<HTML>
+	<canvas id='lab04' height="500" width="1500" style='border-width: 3px'/>	
+	<script>
+		var buffer = [];
+		var img = new Image();
+		img.src = 'img.jpg';
+		img.onload = function(){
+			draw(this);
+		};
+		//Задаём параметры для оператора Собеля и выводим на экран полученный результат
+		function draw(img){
+			var canvas = document.getElementById('lab04');
+			var ctx = canvas.getContext('2d');
+			ctx.drawImage(img, 0, 0);
+			img.style.display = 'none';
+			
+			//Заранее создаём используемые переменные
+			var imageData, imageRectData, imageSobelData;
+			var data, dataRect, dataSobel;
+			
+			//Считываем информацию о пикселях				
+			imageData = ctx.getImageData(0, 0, img.width, img.height);
+			//Превращаем изображение в ч/б
+			ctx.putImageData(grayscale(imageData), 0, 0);
+			//Согласно оператору Собеля задаём алгоритм для изображения
+			var SobelOperator = function(){
+				for(var j = 0; j < img.height; j++){
+					for(var i = 0; i < img.width; i++){
+						imageRectData = ctx.getImageData(i, j, 3, 3);
+						dataRect = imageRectData.data;
+						var x = (-1 * dataRect[0] - 2 * dataRect[4] - 1 * dataRect[8] + 1 * dataRect[20] + 2 * dataRect[24] + 1 * dataRect[28]);
+						var y = (-1 * dataRect[0] - 2 * dataRect[4] - 1 * dataRect[8] + 1 * dataRect[20] + 2 * dataRect[24] + 1 * dataRect[28]);
+						var color = Math.round(Math.sqrt(x*x + y+y));
+						buffer.push(color);
+						buffer.push(color);
+						buffer.push(color);
+						buffer.push(255);
+					}
+				}
+			};
+		SobelOperator();
+		
+		//Считываем полученные пиксели
+		imageSobelData = ctx.getImageData(0, 0, img.width, img.height);
+		dataSobel = imageSobelData.data;
+		//Копируем их буффера в dataSobel
+		for(k = 0; k < dataSobel.length; k++){
+			dataSobel[k] = buffer[k];
+		}
+		
+		//Отрисовываем наши изображения
+		ctx.putImageData(imageSobelData, 750, 0);
+		ctx.drawImage(img, 0, 0);
+		}
+		//Преобразовываем изображение в ч/б 
+		function grayscale(grayData)
+		{
+			for(var i = 0; i < grayData.data.length; i+=4)
+			{
+				var grayscale = Math.floor((grayData.data[i] + grayData.data[i+1] + grayData.data[i+2])/3);
+				grayData.data[i] = grayscale;
+				grayData.data[i+1] = grayscale;
+				grayData.data[i+2] = grayscale;
+	    	}
+	    	return grayData;
+		}
+	</script>
+</HTML
